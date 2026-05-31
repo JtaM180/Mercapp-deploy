@@ -1,10 +1,15 @@
-// routes/categories.js
-const express = require("express");
-const router = express.Router();
-const db = require("../data/db");
+const express = require('express')
+const router = express.Router()
+const { Category } = require('../data/db')
 
-router.get("/", (req, res) => {
-  res.json(db.categories);
-});
+// GET todas las categorías
+router.get('/', async (req, res) => {
+  try {
+    const categories = await Category.find()
+    res.json(categories)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
 
-module.exports = router;
+module.exports = router

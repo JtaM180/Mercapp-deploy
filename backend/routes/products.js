@@ -1,44 +1,66 @@
-//routes/products.js
-const express = require('express');
-const router = express.Router();
-const db = require("../data/db");
+const express = require('express')
+const router = express.Router()
+const { Product } = require('../data/db')
 
 // GET todos los productos
-router.get("/", (req, res) => {
-  res.json(db.products);
-});
+router.get('/', async (req, res) => {
+  try {
+    const products = await Product.find()
+    res.json(products)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// GET producto por ID
+router.get('/:id', async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id)
+    if (!product) return res.status(404).json({ error: 'Producto no encontrado' })
+    res.json(product)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
 
 // POST crear producto
-router.post("/", (req, res) => {
-  const { name, description, price, imageUrl, categoryId, stock } = req.body;
-  if (!name || !price || !categoryId) {
-    return res.status(400).json({ error: "name, price y categoryId son obligatorios" });
-  }
-  if (price <= 0) return res.status(400).json({ error: "El precio debe ser mayor a 0" });
-  if (stock < 0) return res.status(400).json({ error: "El stock no puede ser negativo" });
+router.post('/', async (req, res) => {
+  try {
+    const { name, description, price, imageUrl, categoryId, stock } = req.body
+    if (!name || !price || !categoryId) {
+      return res.status(400).json({ error: 'name, price y categoryId son obligatorios' })
+    }
+    if (price <= 0) return res.status(400).json({ error: 'El precio debe ser mayor a 0' })
+    if (stock < 0) return res.status(400).json({ error: 'El stock no puede ser negativo' })
 
-  const newProduct = { id: db.nextId, name, description, price, imageUrl, categoryId, stock: stock || 0 };
-  db.setNextId(db.nextId + 1);
-  db.products.push(newProduct);
-  res.status(201).json(newProduct);
-});
+    const product = new Product({ name, description, price, imageUrl, categoryId, stock: stock || 0 })
+    await product.save()
+    res.status(201).json(product)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
 
 // PUT editar producto
-router.put("/:id", (req, res) => {
-  const index = db.products.findIndex(p => p.id === parseInt(req.params.id));
-  if (index === -1) return res.status(404).json({ error: "Producto no encontrado" });
+router.put('/:id', async (req, res) => {
+  try {
+    const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true })
+    if (!product) return res.status(404).json({ error: 'Producto no encontrado' })
+    res.json(product)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
 
-  db.products[index] = { ...db.products[index], ...req.body, id: db.products[index].id };
-  res.json(db.products[index]);
-});
+// DELETE eliminar producto
+router.delete('/:id', async (req, res) => {
+  try {
+    const product = await Product.findByIdAndDelete(req.params.id)
+    if (!product) return res.status(404).json({ error: 'Producto no encontrado' })
+    res.json({ message: 'Producto eliminado' })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
 
-// DELETE borrar producto
-router.delete("/:id", (req, res) => {
-  const index = db.products.findIndex(p => p.id === parseInt(req.params.id));
-  if (index === -1) return res.status(404).json({ error: "Producto no encontrado" });
-
-  db.products.splice(index, 1);
-  res.json({ message: "Producto eliminado" });
-});
-
-module.exports = router;
+module.exports = router
