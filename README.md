@@ -9,12 +9,12 @@
 ## URLs de Producción
 | Servicio | URL |
 |---|---|
-| 🌐 Frontend (Netlify) | *(completar tras deploy)* |
-| ⚙️ Backend API (Railway) | *(completar tras deploy)* |
-| 📄 Micrositio (GitHub Pages) | *(completar tras deploy)* |
+| 🌐 Frontend (Netlify) | https://chic-cranachan-97e1fe.netlify.app |
+| ⚙️ Backend API (Railway) | https://mercapp-deploy-production.up.railway.app |
+| 📄 Micrositio (GitHub Pages) | https://jtam180.github.io/Mercapp-deploy |
 
 ## Funcionalidades
-- API REST con Express (productos y categorías)
+- API REST con Express y MongoDB Atlas (productos y categorías)
 - CRUD completo de productos
 - Catálogo con buscador y filtro por categoría
 - Detalle de producto
@@ -29,8 +29,8 @@
 [Usuario] → [Netlify - Vue 3 SPA]
                     ↓ HTTPS + CORS
               [Railway - Express API]
-                    ↓ datos en memoria
-              [In-Memory Store]
+                    ↓ MongoDB Atlas (Mongoose)
+              [MongoDB Atlas - Base de datos]
 ```
 
 ## Variables de Entorno
@@ -38,12 +38,13 @@
 ### Backend (Railway)
 ```
 PORT=3000
-FRONTEND_URL=https://tu-app.netlify.app
+MONGODB_URI=mongodb+srv://...
+FRONTEND_URL=https://chic-cranachan-97e1fe.netlify.app
 ```
 
 ### Frontend (Netlify)
 ```
-VITE_API_URL=https://tu-api.railway.app
+VITE_API_URL=https://mercapp-deploy-production.up.railway.app
 ```
 
 ## Ejecución Local
@@ -76,6 +77,7 @@ npm run preview   # previsualizar build
 | PUT | /api/products/:id | Editar producto |
 | DELETE | /api/products/:id | Eliminar producto |
 | GET | /api/categories | Listar categorías |
+| POST | /api/categories | Crear categoría |
 
 ## Rutas de la App
 - `/` - Catálogo principal (búsqueda + filtros)
